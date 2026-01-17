@@ -84,24 +84,24 @@ const Summary: React.FC<SummaryProps> = ({ sales, onBack }) => {
           
           {/* Left Section: Logo + Brand */}
           <div className="flex items-center gap-3 group cursor-pointer">
-            <div className="flex h-10 w-10 items-center justify-center rounded-[0.75rem] bg-gradient-to-br from-[#13ec5b] to-[#34d399] text-white shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-transform duration-200 group-hover:scale-105">
+            <div className="flex h-10 w-10 items-center justify-center rounded-[0.75rem] bg-[#245feb] text-white shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-transform duration-200 group-hover:scale-105">
               <span className="material-symbols-outlined !text-[1.5rem]">leaderboard</span>
             </div>
             <span className="text-[1.25rem] font-[800] tracking-[-0.025em] leading-tight text-[#0f172a]">
-              Sales App
+              ShopKeeper
             </span>
           </div>
           
-          {/* Right Section: Back Action */}
+          {/* Right Section: Back Action (Styled as per reference image) */}
           <button 
             onClick={onBack}
-            className="flex items-center gap-2 text-[#64748b] font-[500] text-[0.875rem] transition-colors duration-200 hover:text-[#0f172a] group"
+            className="flex items-center gap-2 text-[#64748b] bg-white border border-[#e2e8f0] px-5 py-2 rounded-full shadow-sm hover:text-[#0f172a] hover:border-[#cbd5e1] hover:shadow-md transition-all duration-200 group"
             aria-label="Retour au Dashboard"
           >
-            <span className="material-symbols-outlined !text-[1.25rem] transition-transform duration-200 group-hover:-translate-x-1">
+            <span className="material-symbols-outlined !text-[20px] transition-transform duration-200 group-hover:-translate-x-1">
               arrow_back
             </span>
-            Retour
+            <span className="text-[0.875rem] font-bold">Retour</span>
           </button>
         </div>
       </header>
@@ -170,7 +170,7 @@ const Summary: React.FC<SummaryProps> = ({ sales, onBack }) => {
           </button>
           
           <p className="text-[0.75rem] text-[#94a3b8] font-bold uppercase tracking-[0.2em] opacity-40">
-            Sales App • Radical Simplicity
+            ShopKeeper • Radical Simplicity
           </p>
         </div>
       </main>

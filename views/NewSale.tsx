@@ -45,7 +45,7 @@ const NewSale: React.FC<NewSaleProps> = ({ onCancel, onSave }) => {
           
           {/* Left Section: Logo + Brand */}
           <div className="flex items-center gap-3 group cursor-pointer">
-            <div className="flex h-10 w-10 items-center justify-center rounded-[0.75rem] bg-gradient-to-br from-[#13ec5b] to-[#34d399] text-white shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-transform duration-200 group-hover:scale-105">
+            <div className="flex h-10 w-10 items-center justify-center rounded-[0.75rem] bg-[#245feb] text-white shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-transform duration-200 group-hover:scale-105">
               <span className="material-symbols-outlined !text-[1.5rem]">leaderboard</span>
             </div>
             <span className="text-[1.25rem] font-[800] tracking-[-0.025em] leading-tight text-[#0f172a]">
