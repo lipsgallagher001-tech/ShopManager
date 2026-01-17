@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Sale, PeriodFilter } from '../types';
 import { APP_CONFIG } from '../constants';
 
@@ -10,11 +10,13 @@ interface SalesListProps {
 
 const SalesList: React.FC<SalesListProps> = ({ sales, onBack }) => {
   const [filter, setFilter] = useState<PeriodFilter>('today');
+  const [showAll, setShowAll] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const filteredSales = sales.filter(sale => {
     const now = new Date();
     const saleDate = new Date(sale.timestamp);
-    
+
     if (filter === 'today') {
       return saleDate.toDateString() === now.toDateString();
     }
@@ -45,22 +47,23 @@ const SalesList: React.FC<SalesListProps> = ({ sales, onBack }) => {
 
     try {
       // Import dynamique de jsPDF pour optimiser le chargement initial
+      // @ts-expect-error - dynamic import from URL
       const { jsPDF } = await import('https://esm.sh/jspdf');
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.getWidth();
-      
-      const primaryBlue = [36, 99, 235]; 
-      const darkText = [15, 23, 42];    
-      const grayText = [100, 116, 139]; 
+
+      const primaryBlue = [36, 99, 235];
+      const darkText = [15, 23, 42];
+      const grayText = [100, 116, 139];
 
       doc.setFillColor(primaryBlue[0], primaryBlue[1], primaryBlue[2]);
       doc.rect(0, 0, pageWidth, 40, 'F');
-      
+
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(22);
       doc.setFont('helvetica', 'bold');
       doc.text(APP_CONFIG.name.toUpperCase(), 14, 25);
-      
+
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
       doc.text(`RAPPORT DE VENTES - PÉRIODE : ${filter.toUpperCase()}`, 14, 32);
@@ -71,11 +74,11 @@ const SalesList: React.FC<SalesListProps> = ({ sales, onBack }) => {
       doc.setFontSize(14);
       doc.setFont('helvetica', 'bold');
       doc.text("Résumé financier", 14, y);
-      
+
       y += 10;
       doc.setDrawColor(226, 232, 240);
       doc.line(14, y, pageWidth - 14, y);
-      
+
       y += 10;
       doc.setFontSize(11);
       doc.setFont('helvetica', 'normal');
@@ -83,7 +86,7 @@ const SalesList: React.FC<SalesListProps> = ({ sales, onBack }) => {
       doc.text("Chiffre d'Affaires Total:", 14, y);
       doc.text("Nombre de Transactions:", 80, y);
       doc.text("Panier Moyen:", 140, y);
-      
+
       y += 7;
       doc.setTextColor(darkText[0], darkText[1], darkText[2]);
       doc.setFont('helvetica', 'bold');
@@ -94,9 +97,9 @@ const SalesList: React.FC<SalesListProps> = ({ sales, onBack }) => {
       y += 20;
       doc.setFontSize(14);
       doc.text("Détail des transactions", 14, y);
-      
+
       y += 8;
-      doc.setFillColor(248, 250, 252); 
+      doc.setFillColor(248, 250, 252);
       doc.rect(14, y, pageWidth - 28, 10, 'F');
       doc.setTextColor(grayText[0], grayText[1], grayText[2]);
       doc.setFontSize(9);
@@ -105,7 +108,7 @@ const SalesList: React.FC<SalesListProps> = ({ sales, onBack }) => {
       doc.text("PRIX UNIT.", 110, y + 6.5);
       doc.text("TOTAL", 150, y + 6.5);
       doc.text("HEURE", 180, y + 6.5);
-      
+
       y += 10;
       doc.setTextColor(darkText[0], darkText[1], darkText[2]);
       doc.setFont('helvetica', 'normal');
@@ -137,10 +140,20 @@ const SalesList: React.FC<SalesListProps> = ({ sales, onBack }) => {
 
       const fileName = `Rapport_Ventes_${filter}_${new Date().toISOString().split('T')[0]}.pdf`;
       doc.save(fileName);
-      
+
     } catch (error) {
       console.error("Erreur lors de l'exportation PDF:", error);
       alert("Une erreur est survenue lors de la génération du PDF.");
+    }
+  };
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = 320; // Width of card + gap
+      scrollContainerRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
     }
   };
 
@@ -155,8 +168,8 @@ const SalesList: React.FC<SalesListProps> = ({ sales, onBack }) => {
             </div>
             <span className="text-[1.125rem] font-black tracking-tight text-[#0f172a]">ShopKeeper</span>
           </div>
-          
-          <button 
+
+          <button
             onClick={onBack}
             className="flex items-center gap-2 text-[#64748b] font-bold text-[0.875rem] px-4 py-2 bg-white border border-[#e2e8f0] rounded-full shadow-sm hover:bg-[#f9fafb] hover:text-[#0f172a] transition-all group"
           >
@@ -175,8 +188,8 @@ const SalesList: React.FC<SalesListProps> = ({ sales, onBack }) => {
             </h1>
             <p className="text-[1.125rem] text-[#64748b] mt-2 font-medium">Historique complet de vos transactions</p>
           </div>
-          
-          <button 
+
+          <button
             onClick={handleExport}
             className="flex items-center justify-center gap-2 bg-[#245feb] text-white px-6 py-3.5 rounded-[1rem] text-[1rem] font-bold shadow-xl hover:bg-[#1d4ed8] hover:-translate-y-1 active:scale-[0.98] transition-all group w-full md:w-auto"
           >
@@ -234,10 +247,10 @@ const SalesList: React.FC<SalesListProps> = ({ sales, onBack }) => {
               <span className="w-2 h-6 bg-[#245feb] rounded-full"></span>
               Historique détaillé
             </h3>
-            
+
             <div className="inline-flex bg-[#f3f4f6] p-1 rounded-full border border-[#e5e7eb] shadow-inner self-start">
               {['today', 'week', 'month'].map((p) => (
-                <button 
+                <button
                   key={p}
                   onClick={() => setFilter(p as PeriodFilter)}
                   className={`px-5 py-2 text-[0.875rem] font-bold rounded-full transition-all capitalize ${filter === p ? 'bg-white text-[#0f172a] shadow-sm ring-1 ring-black/5' : 'text-[#64748b] hover:text-[#0f172a]'}`}
@@ -257,43 +270,69 @@ const SalesList: React.FC<SalesListProps> = ({ sales, onBack }) => {
                 <p className="text-[#cbd5e1] text-[0.875rem]">Les ventes enregistrées apparaîtront ici.</p>
               </div>
             ) : (
-              filteredSales.map((sale, idx) => (
-                <div 
-                  key={sale.id} 
-                  style={{ animationDelay: `${0.1 + (idx * 0.05)}s` }}
-                  className="group bg-white p-5 rounded-[1.25rem] border border-[#e2e8f0] shadow-sm flex items-center gap-5 hover:shadow-lg hover:-translate-y-1 hover:border-[#245feb]/20 transition-all cursor-pointer animate-[fadeIn_0.5s_ease-out_forwards] opacity-0"
+              <div className="flex flex-col gap-4">
+                {/* Container de scroll horizontal */}
+                <div
+                  ref={scrollContainerRef}
+                  className="flex gap-4 overflow-x-auto pb-4 scroll-smooth no-scrollbar snap-x snap-mandatory"
+                  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                 >
-                  <div className="flex-shrink-0 h-14 w-14 rounded-[1rem] bg-[#f8fafc] flex items-center justify-center text-[1.75rem] border border-[#e2e8f0] group-hover:bg-[#eff6ff] group-hover:scale-105 transition-all">
-                    {sale.emoji || '🛒'}
-                  </div>
-                  
-                  <div className="flex-1 min-w-0">
-                    <h4 className="text-[1.125rem] font-[800] text-[#0f172a] truncate group-hover:text-[#245feb] transition-colors">{sale.product}</h4>
-                    <p className="text-[0.875rem] font-medium text-[#64748b] truncate mt-0.5">
-                      {sale.quantity} unité{sale.quantity > 1 ? 's' : ''} • {sale.unitPrice.toLocaleString()} {APP_CONFIG.currency}/unité
-                    </p>
-                  </div>
-                  
-                  <div className="flex flex-col items-end gap-1.5">
-                    <div className="text-[1.25rem] font-[900] text-[#10b981] tracking-tighter">
-                      {sale.total.toLocaleString()} <span className="text-[0.75rem] font-bold">{APP_CONFIG.currency}</span>
+                  {filteredSales.map((sale, idx) => (
+                    <div
+                      key={sale.id}
+                      style={{ animationDelay: `${0.1 + (idx * 0.05)}s` }}
+                      className="flex-shrink-0 w-[300px] snap-start bg-white p-5 rounded-[1.25rem] border border-[#e2e8f0] shadow-sm flex items-center gap-5 hover:shadow-lg hover:-translate-y-1 hover:border-[#245feb]/20 transition-all cursor-pointer animate-[fadeIn_0.5s_ease-out_forwards] opacity-0"
+                    >
+                      <div className="flex-shrink-0 h-14 w-14 rounded-[1rem] bg-[#f8fafc] flex items-center justify-center text-[1.75rem] border border-[#e2e8f0] group-hover:bg-[#eff6ff] group-hover:scale-105 transition-all">
+                        {sale.emoji || '🛒'}
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-[1.125rem] font-[800] text-[#0f172a] truncate group-hover:text-[#245feb] transition-colors">{sale.product}</h4>
+                        <p className="text-[0.875rem] font-medium text-[#64748b] truncate mt-0.5">
+                          {sale.quantity} unité{sale.quantity > 1 ? 's' : ''} • {sale.unitPrice.toLocaleString()} {APP_CONFIG.currency}
+                        </p>
+                      </div>
+
+                      <div className="flex flex-col items-end gap-1.5">
+                        <div className="text-[1.125rem] font-[900] text-[#10b981] tracking-tighter">
+                          {sale.total.toLocaleString()}
+                        </div>
+                        <div className="text-[0.7rem] font-bold text-[#94a3b8]">
+                          {new Date(sale.timestamp).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                        </div>
+                      </div>
                     </div>
-                    <div className="inline-flex items-center gap-1 text-[0.75rem] font-bold text-[#94a3b8] bg-[#f8fafc] px-2 py-0.5 rounded-full border border-[#f1f5f9]">
-                      <span className="material-symbols-outlined !text-[12px]">schedule</span>
-                      {new Date(sale.timestamp).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
-                    </div>
-                  </div>
+                  ))}
                 </div>
-              ))
+
+                {/* Boutons de navigation en bas et centrés */}
+                {filteredSales.length > 3 && (
+                  <div className="flex justify-center gap-4">
+                    <button
+                      onClick={() => scroll('left')}
+                      className="w-12 h-12 bg-white border-2 border-[#e2e8f0] rounded-full shadow-md flex items-center justify-center text-[#245feb] hover:bg-[#f8fafc] hover:border-[#245feb]/30 hover:-translate-y-0.5 active:scale-95 transition-all"
+                    >
+                      <span className="material-symbols-outlined !text-[28px]">chevron_left</span>
+                    </button>
+                    <button
+                      onClick={() => scroll('right')}
+                      className="w-12 h-12 bg-white border-2 border-[#e2e8f0] rounded-full shadow-md flex items-center justify-center text-[#245feb] hover:bg-[#f8fafc] hover:border-[#245feb]/30 hover:-translate-y-0.5 active:scale-95 transition-all"
+                    >
+                      <span className="material-symbols-outlined !text-[28px]">chevron_right</span>
+                    </button>
+                  </div>
+                )}
+              </div>
             )}
           </div>
         </div>
 
         {/* Footer final */}
         <footer className="mt-24 text-center animate-stagger-5 opacity-40">
-           <p className="text-[11px] text-[#4d6499] uppercase tracking-[0.25em] font-[900]">
-             ShopKeeper • Radical Simplicity
-           </p>
+          <p className="text-[11px] text-[#4d6499] uppercase tracking-[0.25em] font-[900]">
+            ShopKeeper • Radical Simplicity
+          </p>
         </footer>
       </main>
     </div>
