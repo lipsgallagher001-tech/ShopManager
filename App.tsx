@@ -53,6 +53,11 @@ const App: React.FC = () => {
     navigateTo('dashboard');
   };
 
+  const handleLogout = () => {
+    setUser(null);
+    navigateTo('login');
+  };
+
   // Rendu conditionnel basé sur l'état
   const renderView = () => {
     switch (currentView) {
@@ -68,6 +73,7 @@ const App: React.FC = () => {
             onNewSale={() => navigateTo('newSale')}
             onViewSales={() => navigateTo('salesList')}
             onViewSummary={() => navigateTo('summary')}
+            onLogout={handleLogout}
           />
         ) : <Register onRegister={handleLoginSuccess} onGoToLogin={() => navigateTo('login')} />;
       case 'newSale':

@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Card } from '../components/UI';
 import { User, Sale } from '../types';
 import { APP_CONFIG } from '../constants';
+import { StorageService } from '../services/storage';
 
 interface DashboardProps {
   user: User;
@@ -10,9 +11,13 @@ interface DashboardProps {
   onNewSale: () => void;
   onViewSales: () => void;
   onViewSummary: () => void;
+  onLogout: () => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ user, sales, onNewSale, onViewSales, onViewSummary }) => {
+const Dashboard: React.FC<DashboardProps> = ({ user, sales, onNewSale, onViewSales, onViewSummary, onLogout }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
   const today = new Date();
   const dateFormatted = today.toLocaleDateString('fr-FR', {
     weekday: 'long',
@@ -20,6 +25,22 @@ const Dashboard: React.FC<DashboardProps> = ({ user, sales, onNewSale, onViewSal
     month: 'long',
     year: 'numeric'
   });
+
+  // Fermer le menu si on clique ailleurs
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleLogout = () => {
+    StorageService.logout();
+    onLogout();
+  };
 
   // Calcul du total du jour
   const todayStart = new Date().setHours(0, 0, 0, 0);
@@ -43,11 +64,39 @@ const Dashboard: React.FC<DashboardProps> = ({ user, sales, onNewSale, onViewSal
             </span>
           </div>
           
-          {/* Right Section: Actions */}
-          <div className="flex items-center gap-2">
-            <button className="flex h-10 w-10 items-center justify-center rounded-full text-[#64748b] hover:bg-[#f1f5f9] hover:text-[#0f172a] transition-all duration-200">
-              <span className="material-symbols-outlined !text-[1.25rem]">settings</span>
+          {/* Right Section: Settings Button Developed */}
+          <div className="relative" ref={menuRef}>
+            <button 
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className={`flex h-10 w-10 items-center justify-center rounded-full transition-all duration-200 ${
+                isMenuOpen ? 'bg-[#245feb] text-white shadow-md' : 'bg-[#f1f5f9] text-[#0f172a] hover:bg-[#e2e8f0]'
+              }`}
+              aria-label="Paramètres"
+            >
+              <span className={`material-symbols-outlined !text-[1.25rem] transition-transform duration-300 ${isMenuOpen ? 'rotate-90' : 'rotate-0'}`}>
+                settings
+              </span>
             </button>
+
+            {/* Dropdown Menu */}
+            {isMenuOpen && (
+              <div className="absolute right-0 mt-3 w-56 bg-white rounded-[1.25rem] shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1),0_8px_10px_-6px_rgba(0,0,0,0.1)] border border-[#f1f5f9] py-2 z-[100] animate-[scaleIn_0.2s_ease-out] origin-top-right">
+                <div className="px-4 py-3 border-b border-[#f1f5f9] mb-1">
+                  <p className="text-[0.75rem] font-bold text-[#94a3b8] uppercase tracking-widest">Utilisateur</p>
+                  <p className="text-[0.875rem] font-extrabold text-[#0f172a] truncate">{user.name}</p>
+                </div>
+                
+                <button 
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-left text-[#ef4444] hover:bg-[#fef2f2] transition-colors group"
+                >
+                  <div className="w-8 h-8 rounded-full bg-[#fef2f2] flex items-center justify-center group-hover:bg-[#fee2e2] transition-colors">
+                    <span className="material-symbols-outlined !text-[18px]">logout</span>
+                  </div>
+                  <span className="font-bold text-[0.875rem]">Se déconnecter</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </header>
