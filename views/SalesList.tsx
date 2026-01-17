@@ -49,12 +49,10 @@ const SalesList: React.FC<SalesListProps> = ({ sales, onBack }) => {
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.getWidth();
       
-      // Configuration des couleurs (identiques au Design System)
-      const primaryBlue = [36, 99, 235]; // #2463eb
-      const darkText = [15, 23, 42];    // #0f172a
-      const grayText = [100, 116, 139]; // #64748b
+      const primaryBlue = [36, 99, 235]; 
+      const darkText = [15, 23, 42];    
+      const grayText = [100, 116, 139]; 
 
-      // --- EN-TÊTE DU DOCUMENT ---
       doc.setFillColor(primaryBlue[0], primaryBlue[1], primaryBlue[2]);
       doc.rect(0, 0, pageWidth, 40, 'F');
       
@@ -68,7 +66,6 @@ const SalesList: React.FC<SalesListProps> = ({ sales, onBack }) => {
       doc.text(`RAPPORT DE VENTES - PÉRIODE : ${filter.toUpperCase()}`, 14, 32);
       doc.text(`Généré le ${new Date().toLocaleString('fr-FR')}`, pageWidth - 70, 32);
 
-      // --- RÉSUMÉ DES PERFORMANCES ---
       let y = 55;
       doc.setTextColor(darkText[0], darkText[1], darkText[2]);
       doc.setFontSize(14);
@@ -94,14 +91,12 @@ const SalesList: React.FC<SalesListProps> = ({ sales, onBack }) => {
       doc.text(`${filteredSales.length}`, 80, y);
       doc.text(`${averageBasket.toLocaleString()} ${APP_CONFIG.currency}`, 140, y);
 
-      // --- TABLEAU DES TRANSACTIONS ---
       y += 20;
       doc.setFontSize(14);
       doc.text("Détail des transactions", 14, y);
       
       y += 8;
-      // En-têtes du tableau
-      doc.setFillColor(248, 250, 252); // Gris très clair
+      doc.setFillColor(248, 250, 252); 
       doc.rect(14, y, pageWidth - 28, 10, 'F');
       doc.setTextColor(grayText[0], grayText[1], grayText[2]);
       doc.setFontSize(9);
@@ -116,20 +111,15 @@ const SalesList: React.FC<SalesListProps> = ({ sales, onBack }) => {
       doc.setFont('helvetica', 'normal');
 
       filteredSales.forEach((sale, index) => {
-        // Nouvelle page si nécessaire
         if (y > 270) {
           doc.addPage();
           y = 20;
         }
-
-        // Alternance de fond pour les lignes
         if (index % 2 === 0) {
           doc.setFillColor(252, 252, 253);
           doc.rect(14, y, pageWidth - 28, 8, 'F');
         }
-
         const timeStr = new Date(sale.timestamp).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-        
         doc.text(sale.product.substring(0, 30), 18, y + 5);
         doc.text(sale.quantity.toString(), 80, y + 5);
         doc.text(`${sale.unitPrice.toLocaleString()}`, 110, y + 5);
@@ -137,36 +127,33 @@ const SalesList: React.FC<SalesListProps> = ({ sales, onBack }) => {
         doc.text(`${sale.total.toLocaleString()}`, 150, y + 5);
         doc.setFont('helvetica', 'normal');
         doc.text(timeStr, 180, y + 5);
-        
         y += 8;
       });
 
-      // --- PIED DE PAGE ---
       doc.setFontSize(8);
       doc.setTextColor(grayText[0], grayText[1], grayText[2]);
       const footerText = "Rapport généré automatiquement par ShopKeeper App - Radical Simplicity";
       doc.text(footerText, pageWidth / 2, 285, { align: 'center' });
 
-      // Téléchargement
       const fileName = `Rapport_Ventes_${filter}_${new Date().toISOString().split('T')[0]}.pdf`;
       doc.save(fileName);
       
     } catch (error) {
       console.error("Erreur lors de l'exportation PDF:", error);
-      alert("Une erreur est survenue lors de la génération du PDF. Vérifiez votre connexion internet.");
+      alert("Une erreur est survenue lors de la génération du PDF.");
     }
   };
 
   return (
     <div className="min-h-screen bg-[#f8fafc] font-['Inter'] antialiased">
-      {/* Sticky Header with Backdrop Blur */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-[#e2e8f0] transition-colors duration-200">
+      {/* Header Sticky avec effet de flou */}
+      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-[#e2e8f0] transition-all duration-300">
         <div className="max-w-[960px] mx-auto px-4 md:px-10 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-1.5 bg-[#eff6ff] rounded-[0.75rem] text-[#245feb]">
-              <span className="material-symbols-outlined !text-[24px]">storefront</span>
+              <span className="material-symbols-outlined !text-[24px]">leaderboard</span>
             </div>
-            <span className="text-[1.125rem] font-bold tracking-tight text-[#0f172a]">ShopKeeper</span>
+            <span className="text-[1.125rem] font-black tracking-tight text-[#0f172a]">ShopKeeper</span>
           </div>
           
           <button 
@@ -180,122 +167,119 @@ const SalesList: React.FC<SalesListProps> = ({ sales, onBack }) => {
       </header>
 
       <main className="max-w-[960px] mx-auto px-4 py-8 md:py-12">
-        {/* Page Title Section */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        {/* Titre et Bouton d'export avec Animation d'entrée */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 animate-stagger-1">
           <div>
-            <h1 className="text-[1.875rem] md:text-[2.25rem] font-black text-[#0f172a] tracking-tight">Mes ventes</h1>
-            <p className="text-[1rem] text-[#64748b]">Historique complet de vos transactions</p>
+            <h1 className="text-[2.25rem] md:text-[2.75rem] font-[900] text-[#0f172a] tracking-tight leading-none">
+              Mes ventes
+            </h1>
+            <p className="text-[1.125rem] text-[#64748b] mt-2 font-medium">Historique complet de vos transactions</p>
           </div>
           
-          <div className="flex items-center gap-2">
-            <button 
-              onClick={handleExport}
-              className="flex items-center gap-2 bg-[#245feb] text-white px-5 py-2.5 rounded-[0.75rem] text-[0.875rem] font-bold shadow-[0_10px_15px_-3px_rgba(36,95,235,0.2)] hover:bg-[#1d4ed8] hover:-translate-y-0.5 active:translate-y-0 transition-all group"
-            >
-              <span className="material-symbols-outlined !text-[20px] transition-transform group-hover:scale-110">picture_as_pdf</span>
-              Exporter PDF
-            </button>
+          <button 
+            onClick={handleExport}
+            className="flex items-center justify-center gap-2 bg-[#245feb] text-white px-6 py-3.5 rounded-[1rem] text-[1rem] font-bold shadow-xl hover:bg-[#1d4ed8] hover:-translate-y-1 active:scale-[0.98] transition-all group w-full md:w-auto"
+          >
+            <span className="material-symbols-outlined !text-[22px] transition-transform group-hover:scale-110">picture_as_pdf</span>
+            Exporter PDF
+          </button>
+        </div>
+
+        {/* Grille de Stats avec Animation Staggered */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12 animate-stagger-2">
+          <div className="bg-white p-6 rounded-[1.25rem] border border-[#e2e8f0] shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-[0.875rem] font-bold text-[#64748b] uppercase tracking-widest">Total CA</span>
+              <div className="p-2 bg-[#ecfdf5] text-[#10b981] rounded-[0.75rem]">
+                <span className="material-symbols-outlined !text-[22px]">payments</span>
+              </div>
+            </div>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-[2rem] font-[900] text-[#0f172a] tracking-tighter">{totalAmount.toLocaleString()}</span>
+              <span className="text-[0.875rem] font-bold text-[#94a3b8]">{APP_CONFIG.currency}</span>
+            </div>
+          </div>
+
+          <div className="bg-white p-6 rounded-[1.25rem] border border-[#e2e8f0] shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-[0.875rem] font-bold text-[#64748b] uppercase tracking-widest">Panier moyen</span>
+              <div className="p-2 bg-[#eff6ff] text-[#245feb] rounded-[0.75rem]">
+                <span className="material-symbols-outlined !text-[22px]">analytics</span>
+              </div>
+            </div>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-[2rem] font-[900] text-[#0f172a] tracking-tighter">{averageBasket.toLocaleString()}</span>
+              <span className="text-[0.875rem] font-bold text-[#94a3b8]">{APP_CONFIG.currency}</span>
+            </div>
+          </div>
+
+          <div className="bg-white p-6 rounded-[1.25rem] border border-[#e2e8f0] shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-[0.875rem] font-bold text-[#64748b] uppercase tracking-widest">Transactions</span>
+              <div className="p-2 bg-[#fff7ed] text-[#ea580c] rounded-[0.75rem]">
+                <span className="material-symbols-outlined !text-[22px]">inventory_2</span>
+              </div>
+            </div>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-[2rem] font-[900] text-[#0f172a] tracking-tighter">{filteredSales.length}</span>
+              <span className="text-[0.875rem] font-bold text-[#94a3b8]">Ventes</span>
+            </div>
           </div>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-          <div className="bg-white p-5 rounded-[1rem] border border-[#e2e8f0] shadow-sm flex flex-col gap-1">
-            <div className="flex items-center justify-between">
-              <span className="text-[0.875rem] font-semibold text-[#64748b]">Total CA</span>
-              <div className="p-1.5 bg-[#ecfdf5] text-[#059669] rounded-[0.5rem]">
-                <span className="material-symbols-outlined !text-[20px]">payments</span>
-              </div>
-            </div>
-            <div className="flex items-baseline gap-1 mt-2">
-              <span className="text-[1.875rem] font-extrabold text-[#0f172a] tracking-tight">{totalAmount.toLocaleString()}</span>
-              <span className="text-[0.875rem] font-bold text-[#94a3b8] uppercase tracking-wide">{APP_CONFIG.currency}</span>
-            </div>
-          </div>
-
-          <div className="bg-white p-5 rounded-[1rem] border border-[#e2e8f0] shadow-sm flex flex-col gap-1">
-            <div className="flex items-center justify-between">
-              <span className="text-[0.875rem] font-semibold text-[#64748b]">Panier moyen</span>
-              <div className="p-1.5 bg-[#eff6ff] text-[#2563eb] rounded-[0.5rem]">
-                <span className="material-symbols-outlined !text-[20px]">analytics</span>
-              </div>
-            </div>
-            <div className="flex items-baseline gap-1 mt-2">
-              <span className="text-[1.875rem] font-extrabold text-[#0f172a] tracking-tight">{averageBasket.toLocaleString()}</span>
-              <span className="text-[0.875rem] font-bold text-[#94a3b8] uppercase tracking-wide">{APP_CONFIG.currency}</span>
-            </div>
-          </div>
-
-          <div className="bg-white p-5 rounded-[1rem] border border-[#e2e8f0] shadow-sm flex flex-col gap-1">
-            <div className="flex items-center justify-between">
-              <span className="text-[0.875rem] font-semibold text-[#64748b]">Articles vendus</span>
-              <div className="p-1.5 bg-[#fff7ed] text-[#ea580c] rounded-[0.5rem]">
-                <span className="material-symbols-outlined !text-[20px]">inventory_2</span>
-              </div>
-            </div>
-            <div className="flex items-baseline gap-1 mt-2">
-              <span className="text-[1.875rem] font-extrabold text-[#0f172a] tracking-tight">{filteredSales.length}</span>
-              <span className="text-[0.875rem] font-bold text-[#94a3b8] uppercase tracking-wide">Transactions</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Filters and List Section */}
-        <div className="flex flex-col gap-6">
+        {/* Liste des ventes avec effet de défilement visuel */}
+        <div className="flex flex-col gap-6 animate-stagger-3">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <h3 className="text-[1.25rem] font-bold text-[#0f172a]">Détail chronologique</h3>
+            <h3 className="text-[1.25rem] font-black text-[#0f172a] flex items-center gap-2">
+              <span className="w-2 h-6 bg-[#245feb] rounded-full"></span>
+              Historique détaillé
+            </h3>
             
             <div className="inline-flex bg-[#f3f4f6] p-1 rounded-full border border-[#e5e7eb] shadow-inner self-start">
-              <button 
-                onClick={() => setFilter('today')}
-                className={`px-5 py-1.5 text-[0.875rem] font-bold rounded-full transition-all ${filter === 'today' ? 'bg-white text-[#0f172a] shadow-sm ring-1 ring-black/5' : 'text-[#64748b] hover:text-[#0f172a]'}`}
-              >
-                Aujourd'hui
-              </button>
-              <button 
-                onClick={() => setFilter('week')}
-                className={`px-5 py-1.5 text-[0.875rem] font-bold rounded-full transition-all ${filter === 'week' ? 'bg-white text-[#0f172a] shadow-sm ring-1 ring-black/5' : 'text-[#64748b] hover:text-[#0f172a]'}`}
-              >
-                Semaine
-              </button>
-              <button 
-                onClick={() => setFilter('month')}
-                className={`px-5 py-1.5 text-[0.875rem] font-bold rounded-full transition-all ${filter === 'month' ? 'bg-white text-[#0f172a] shadow-sm ring-1 ring-black/5' : 'text-[#64748b] hover:text-[#0f172a]'}`}
-              >
-                Mois
-              </button>
+              {['today', 'week', 'month'].map((p) => (
+                <button 
+                  key={p}
+                  onClick={() => setFilter(p as PeriodFilter)}
+                  className={`px-5 py-2 text-[0.875rem] font-bold rounded-full transition-all capitalize ${filter === p ? 'bg-white text-[#0f172a] shadow-sm ring-1 ring-black/5' : 'text-[#64748b] hover:text-[#0f172a]'}`}
+                >
+                  {p === 'today' ? "Aujourd'hui" : p === 'week' ? 'Semaine' : 'Mois'}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Transactions List */}
-          <div className="flex flex-col gap-3">
+          {/* Transactions avec animation d'apparition différée */}
+          <div className="flex flex-col gap-4">
             {filteredSales.length === 0 ? (
-              <div className="py-16 text-center bg-white rounded-[1rem] border border-dashed border-[#e2e8f0]">
-                <span className="material-symbols-outlined !text-[48px] text-[#cbd5e1] mb-2">history</span>
-                <p className="text-[#94a3b8] font-medium italic">Aucune vente enregistrée pour cette période.</p>
+              <div className="py-20 text-center bg-white rounded-[1.5rem] border-2 border-dashed border-[#e2e8f0] animate-[fadeIn_0.5s_ease-out]">
+                <span className="material-symbols-outlined !text-[64px] text-[#cbd5e1] mb-4">history_toggle_off</span>
+                <p className="text-[#94a3b8] font-bold text-[1.125rem]">Aucune vente pour le moment</p>
+                <p className="text-[#cbd5e1] text-[0.875rem]">Les ventes enregistrées apparaîtront ici.</p>
               </div>
             ) : (
-              filteredSales.map((sale) => (
+              filteredSales.map((sale, idx) => (
                 <div 
                   key={sale.id} 
-                  className="group bg-white p-5 rounded-[1rem] border border-[#e2e8f0] shadow-sm flex items-center gap-5 hover:shadow-md hover:-translate-y-0.5 hover:border-[#245feb]/20 transition-all cursor-pointer"
+                  style={{ animationDelay: `${0.1 + (idx * 0.05)}s` }}
+                  className="group bg-white p-5 rounded-[1.25rem] border border-[#e2e8f0] shadow-sm flex items-center gap-5 hover:shadow-lg hover:-translate-y-1 hover:border-[#245feb]/20 transition-all cursor-pointer animate-[fadeIn_0.5s_ease-out_forwards] opacity-0"
                 >
-                  <div className="flex-shrink-0 h-12 w-12 rounded-full bg-[#f8fafc] flex items-center justify-center text-[1.5rem] border border-[#e2e8f0] group-hover:bg-[#eff6ff] transition-colors">
+                  <div className="flex-shrink-0 h-14 w-14 rounded-[1rem] bg-[#f8fafc] flex items-center justify-center text-[1.75rem] border border-[#e2e8f0] group-hover:bg-[#eff6ff] group-hover:scale-105 transition-all">
                     {sale.emoji || '🛒'}
                   </div>
                   
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-[1rem] font-bold text-[#0f172a] truncate group-hover:text-[#245feb] transition-colors">{sale.product}</h4>
-                    <p className="text-[0.875rem] text-[#64748b] truncate">
-                      {sale.quantity} unité{sale.quantity > 1 ? 's' : ''} × {sale.unitPrice.toLocaleString()} {APP_CONFIG.currency}
+                    <h4 className="text-[1.125rem] font-[800] text-[#0f172a] truncate group-hover:text-[#245feb] transition-colors">{sale.product}</h4>
+                    <p className="text-[0.875rem] font-medium text-[#64748b] truncate mt-0.5">
+                      {sale.quantity} unité{sale.quantity > 1 ? 's' : ''} • {sale.unitPrice.toLocaleString()} {APP_CONFIG.currency}/unité
                     </p>
                   </div>
                   
-                  <div className="flex flex-col items-end gap-1">
-                    <div className="text-[1.125rem] font-[900] text-[#059669] tracking-tight">
+                  <div className="flex flex-col items-end gap-1.5">
+                    <div className="text-[1.25rem] font-[900] text-[#10b981] tracking-tighter">
                       {sale.total.toLocaleString()} <span className="text-[0.75rem] font-bold">{APP_CONFIG.currency}</span>
                     </div>
-                    <div className="text-[0.75rem] font-semibold text-[#9ca3af]">
+                    <div className="inline-flex items-center gap-1 text-[0.75rem] font-bold text-[#94a3b8] bg-[#f8fafc] px-2 py-0.5 rounded-full border border-[#f1f5f9]">
+                      <span className="material-symbols-outlined !text-[12px]">schedule</span>
                       {new Date(sale.timestamp).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
                     </div>
                   </div>
@@ -305,9 +289,10 @@ const SalesList: React.FC<SalesListProps> = ({ sales, onBack }) => {
           </div>
         </div>
 
-        <footer className="mt-20 text-center opacity-40">
-           <p className="text-[10px] text-[#4d6499] uppercase tracking-[0.2em] font-black">
-             ShopKeeper • Gestion radicalement simple
+        {/* Footer final */}
+        <footer className="mt-24 text-center animate-stagger-5 opacity-40">
+           <p className="text-[11px] text-[#4d6499] uppercase tracking-[0.25em] font-[900]">
+             ShopKeeper • Radical Simplicity
            </p>
         </footer>
       </main>
